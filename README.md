@@ -1,6 +1,11 @@
 # Team-17-phase1-web
 
-Ben Kazadi - UI
+Christopher Chasanda (chrischas161) - UI
+
 Emmanuel Chate (ChattyBlaq) - Frontend
+
+Ben Kazadi (benkazadi) - Backend
+
 Chipo Chisonga (Chipo187) - Security
-Grabriel Nkonde (GTIS-dotcom) - Backend, Documentation
+
+Grabriel Nkonde (GTIS-dotcom) - Documentation
