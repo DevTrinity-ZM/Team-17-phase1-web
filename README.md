@@ -1,6 +1,6 @@
 # Team-17-phase1-web
 
-Christopher Chasanda (chrischas161) - UI
+Ben Kazadi (benkazadi) - UI
 
 Emmanuel Chate (ChattyBlaq) - Frontend
 
