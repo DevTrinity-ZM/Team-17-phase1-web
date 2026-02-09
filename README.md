@@ -2,7 +2,7 @@
 
 Ben Kazadi (benkazadi) - UI
 
-Emmanuel Chate (ChattyBlaq) - Frontend
+Lusungu Chirwa (chirwalusungu126-dotcom) - Frontend
 
 Ben Kazadi (benkazadi) - Backend
 
