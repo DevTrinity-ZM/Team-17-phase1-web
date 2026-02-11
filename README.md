@@ -1,9 +1,24 @@
 # Team-17-phase1-web
 
-Grabriel Nkonde (GTIS-dotcom) - Documentation & UI
+# Momentum - Smart Goal & Task Management
 
-Lusungu Chirwa (chirwalusungu126-dotcom) - Frontend
+> Intelligent prioritization for achieving your goals
 
-Ben Kazadi (benkazadi) - Backend
+## Overview
+This is a comprehensive web application designed to help users 
+effectively set goals, prioritize tasks, and maintain focus on what matters most. The 
+application addresses common productivity challenges through intelligent task 
+management, deadline-aware prioritization, and meaningful progress tracking. 
 
-Chipo Chisonga (Chipo187) - Security
+## Team Roles
+- **Frontend**: @benkazadi - React development
+- **Backend**: @FRANK-B-z - API & database
+- **UI/UX**: @GTIS-dotcom - Design & user experience
+- **Documentation**: @chirwalusungu126-dotcom - Docs & guides
+- **Security**: Chipo187 - Security
+
+## Architecture
+- **Frontend**: React + Vite
+- **Backend**: Node.js + Express
+- **Database**: PostgreSQL (Supabase)
+- **Auth**: Supabase Auth
