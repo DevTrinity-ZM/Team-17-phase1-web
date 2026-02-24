@@ -31,7 +31,40 @@ function Card({ className, title, children, tag='', metrics=''}) {
 }
 
 function App() {
-	const [goals, setGoals] = useState([])
+	const [showPopup, setShowPopup] = useState(false);
+	const [goals, setGoals] = useState([]);
+
+	function addGoal(goalData) {
+		setGoals([...goals, goalData]);
+		setShowPopup(false);
+	}
+
+	function GoalPopup() {
+		//for goal information input
+		const [goalName, setGoalName] = useState('');
+
+		function submit() {
+			const newGoal = {
+				id: Date.now(),
+				name: goalName,
+			}
+
+			addGoal(newGoal);
+		}
+
+		return (
+			<div className='popup-container'>
+				<div className='goal-popup'>
+					<h1>Goal Name:</h1>
+					<input type="text" 
+					value={goalName}
+					onChange={(e) => {setGoalName(e.target.value)}}/>
+					<button className='cancel' onClick={() => {setShowPopup(false)}}>X</button>
+					<button className='submit' onClick={submit}>Add Goal</button>
+				</div>
+			</div>
+		)
+	}
 
 	return (
 		<>
@@ -64,12 +97,16 @@ function App() {
 			<main>
 				<Card className='goals' title='ACTIVE GOALS' tag='Filter'>
 					{goals.map((goal, index) => (
-						<div key={index} className='goal'>{goal}</div>
+						<div key={index} className='goal'>
+							<h2 className='goal-title'>{goal.name}</h2>
+							<div className='goal-info'></div>
+							<div className='progress-bar'>
+								<div className="progress"></div>
+							</div>
+						</div>
 					))}
 					
-					<button className='add' onClick={() => {
-						setGoals([...goals, '<div className="goal"></div>'])
-					}}>+ Add Goal</button>
+					<button className='add' onClick={() => {setShowPopup(true)}}>+ Add Goal</button>
 				</Card>
 				<Card className='metrics' title='METRICS' metrics={['Completion Rate', 'Avg. Tasks/Day', 'Focus Time']}></Card>
 			</main>
@@ -77,6 +114,7 @@ function App() {
 				<div>Priority 1</div>
 				<div>Priority 2</div>
 			</Card>
+			{showPopup && <GoalPopup />}
 		</>
 	)
 }
