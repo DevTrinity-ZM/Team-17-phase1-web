@@ -91,12 +91,7 @@ nav {
 	color: #6C7293;
 	font-size: 1rem;
 }
-.card div {
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
+
 .card .top {
 	display: flex;
 	flex-direction: row;
@@ -121,10 +116,12 @@ main {
 	display: flex;
 	gap: 2rem;
 	margin-bottom: 1.5rem;
+	height: 40rem;
 }
 
-#goals {
+.goals {
 	width: 70%;
+	height: 100%;
 	overflow-y: scroll;
 	scrollbar-color: #00DDFF #11152B;
 	scrollbar-width: thin;
@@ -143,8 +140,9 @@ main {
 	transform: translate(5px, 0);
 }
 .add {
+	display: block;
 	padding: 1rem 2rem;
-	margin-top: 2rem;
+	margin: 2rem auto 0 auto;
 	cursor: pointer;
 	background-color: #00DDFF;
 	color: #0A0E27;
@@ -153,10 +151,27 @@ main {
 	border: none;
 	border-radius: 1rem;
 }
-#metrics {
+
+
+.metrics {
 	width: 35%;
+	height: 100%;
 }
-#priority {
+.metric-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	margin-top: 3rem;
+}
+.metric-card {
+	background-color: #151A32;
+	height: 7rem;
+	padding: 1rem;
+	border-left: 3px solid #00DDFF;
+	border-radius: 5px;
+}
+
+.priority {
 	width: 100%;
 	margin-bottom: 5rem;
 }

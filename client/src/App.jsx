@@ -4,15 +4,27 @@ import './App.css'
 //id in this case is used for styling, title is for the card, children is the card contents
 //tag is the button on the top right of the card, where available
 //metrics is only for the METRICS card
-function Card({ id, title, children, tag='', metrics=''}) {
+function Card({ className, title, children, tag='', metrics=''}) {
 	return (
-		<div className='card' id={id}>
+		<div className={`card ${className}`}>
 			<div className='top'>
 				<h1 className='card-title'>{title}</h1>
-				{tag ? <button>[{tag}]</button> : ''}
+				{tag && <button>[{tag}]</button>}
 			</div>
-			{Children.map(children, child => 
-				<div>{child}</div>
+
+			{children}
+
+			{/*Display metrics only for the metrics card*/}
+			{metrics && (
+				<div className='metric-container'>
+					{
+						metrics.map((metric, index) => {
+							return (
+								<div key={index} className='metric-card'>{metric}</div>
+							)
+						})
+					}
+				</div>
 			)}
 		</div>
 	)
@@ -50,24 +62,18 @@ function App() {
 				</div>
 			</nav>
 			<main>
-				<Card id='goals' title='ACTIVE GOALS' tag='Filter'>
-					<div className='goal'></div>
-					<div className='goal'></div>
-					<div className='goal'></div>
+				<Card className='goals' title='ACTIVE GOALS' tag='Filter'>
+					{goals.map((goal, index) => (
+						<div key={index} className='goal'>{goal}</div>
+					))}
 					
 					<button className='add' onClick={() => {
-						goals.push('yo')
-						console.log(goals)
+						setGoals([...goals, '<div className="goal"></div>'])
 					}}>+ Add Goal</button>
-					<ul>
-						{goals.map(goal => (
-							<li key='ye'>{goal}</li>
-						))}
-					</ul>
 				</Card>
-				<Card id='metrics' title='METRICS' metrics={['Completion Rate', 'Avg. Tasks/Day', 'Focus Time']}></Card>
+				<Card className='metrics' title='METRICS' metrics={['Completion Rate', 'Avg. Tasks/Day', 'Focus Time']}></Card>
 			</main>
-			<Card id='priority' title='PRIORITY QUEUE' tag='Sort'>
+			<Card className='priority' title='PRIORITY QUEUE' tag='Sort'>
 				<div>Priority 1</div>
 				<div>Priority 2</div>
 			</Card>
