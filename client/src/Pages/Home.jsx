@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 //id in this case is used for styling, title is for the card, children is the card contents
@@ -32,29 +32,44 @@ function Card({ className, title, children, tag='', metrics=''}) {
 
 function Home() {
 	const [showPopup, setShowPopup] = useState(false);
-	const [goals, setGoals] = useState(() => {
-		const saved = localStorage.getItem('goals');
-		return saved ? JSON.parse(saved) : [];
-	});
-
+	const [goals, setGoals] = useState([]);
+	
 	useEffect(() => {
-			localStorage.setItem('goals', JSON.stringify(goals));
-	}, [goals])
-		
-	function addGoal(goalData) {
-		setGoals([...goals, goalData]);
-		setShowPopup(false);
-	}
+		fetch("http://localhost:3001/goals")
+			.then(res => res.json())
+			.then(data => setGoals(data))
+			.catch(err => console.error(err));
+	}, []);
 
+	async function addGoal(goalData) {
+		try {
+			await fetch("http://localhost:3001/goals", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(goalData)
+			});
+
+			const res = await fetch("http://localhost:3001/goals");
+			const updated = await res.json();
+			setGoals(updated);
+
+			setShowPopup(false);
+		} catch (err) {
+			console.error(err);
+		}
+	}
+		
 	function GoalPopup() {
 		//date
 		const today = new Date().toISOString().split('T')[0];
+
 		//for goal information input
 		const [goalName, setGoalName] = useState('');
 		const [deadline, setDeadline] = useState('');
 		const [totalTasks, setTotalTasks] = useState(0);
 		const [completedTasks, setCompletedTasks] = useState(0);
 		const [streak, setStreak] = useState(0);
+		const [priority, setPriority] = useState("Low");
 
 		const handleSubmit = () => {
 			let now = new Date();
@@ -73,6 +88,7 @@ function Home() {
 				streak: streak,
 				totalTasks: totalTasks,
 				completedTasks: completedTasks,
+				priority: priority,
 			};
 
 			if(goalName != '') {
