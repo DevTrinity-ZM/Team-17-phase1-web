@@ -1,10 +1,19 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import Details from './Pages/Details';
 import Home from './Pages/Home';
 
 function App() {
+	const [goals, setGoals] = useState([]);
+		
+	useEffect(() => {
+		fetch("http://localhost:3001/goals")
+			.then(res => res.json())
+			.then(data => setGoals(data))
+			.catch(err => console.error(err));
+	}, []);
+	
 	return (
 		<BrowserRouter>
 			<nav>
@@ -18,7 +27,7 @@ function App() {
 				<div className='data'>
 					<div>
 						<p>ACTIVE</p>
-						<h2>{JSON.parse(localStorage.getItem('goals')).length}</h2>
+						<h2>{goals.length}</h2>
 					</div>
 					<div>
 						<p>COMPLETED</p>

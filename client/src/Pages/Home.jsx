@@ -86,9 +86,10 @@ function Home() {
 				deadline: deadline,
 				daysLeft: days_left,
 				streak: streak,
-				totalTasks: totalTasks,
-				completedTasks: completedTasks,
+				totalTasks: Number(totalTasks),
+				completedTasks: Number(completedTasks),
 				priority: priority,
+				tasks: []
 			};
 
 			if(goalName != '') {
@@ -142,7 +143,7 @@ function Home() {
 			<main>
 				<Card className='goals' title='ACTIVE GOALS' tag='Filter'>
                     {goals.map((goal) => (
-						<Link to="/GoalDetails" state={ goal }>
+						<Link to="/GoalDetails" state={ goal } key={goal.id}>
                         <div key={goal.id} className='goal'>
                             <h2 className='goal-title'>{goal.goalName}</h2>
                             <div className='goal-info'>
@@ -174,12 +175,13 @@ function Home() {
 				<div className='priorities'>
 					{ goals.map((goal) => (
 						<div className='slot' key={goal.id}>
-							<div>{goal.goalName}</div>
+							<div className='name'>{goal.goalName}</div>
 							<div className='tag'>P0</div>
 						</div>
 					))}
 				</div>
 			</Card>
+			<Card className='metrics mobile' title='METRICS' metrics={['Completion Rate', 'Avg. Tasks/Day', 'Focus Time']}></Card>
 			{showPopup && <GoalPopup />}
         </>
 	)
