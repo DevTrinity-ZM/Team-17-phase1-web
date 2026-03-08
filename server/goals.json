@@ -1,28 +1,16 @@
 [
   {
-    "id": 1772378351927,
+    "id": 1772816952527,
     "goalName": "Goal 1",
-    "deadline": "2026-03-02",
-    "daysLeft": 1,
+    "deadline": "2026-03-20",
+    "daysLeft": 14,
     "streak": 0,
-    "totalTasks": 10,
+    "totalTasks": 2,
     "completedTasks": 0,
-    "priority": "Low",
-    "tasks": []
-  },
-  {
-    "id": 1772380275580,
-    "goalName": "Test 1",
-    "deadline": "2026-03-05",
-    "daysLeft": 4,
-    "streak": 0,
-    "totalTasks": 20,
-    "completedTasks": 0,
-    "priority": "Low",
+    "priority": "low",
     "tasks": [
-      "This is new text",
-      "This is new text",
-      "This is new text"
+      "This is a task",
+      "And another"
     ]
   }
 ]

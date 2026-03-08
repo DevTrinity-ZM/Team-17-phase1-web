@@ -1,50 +1,54 @@
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
-
-function Task() {
-	return (
-		<div className="task-container">
-			<div className="task">
-				<div className="checkbox">
-					<input type="checkbox" />
-				</div>
-				This is a task
-			</div>
-			<div className="xp">5XP</div>
-		</div>
-	)
-}
+import { useEffect, useState } from "react";
 
 function Details() {
+	const { state } = useLocation();
+	const [goal, setGoal] = useState(state);
+
+	useEffect(() => {
+		fetch("http://localhost:3001/goals/")
+			.then(res => res.json())
+			.then(goals => {
+				setGoal(goals.find(g => g.id == state.id))
+			})
+			.catch(err => console.error(err))
+	}, [])
+
 	let date = new Date();
 	date = date.toDateString();
-	const { state } = useLocation();
-	const goalName = String(state.goalName);
-	const priority = String(state.priority);
-	const totalTasks = Number(state.totalTasks);
-	const completedTasks = Number(state.completedTasks);
 
-	async function addTask() {
-		const [tasks, setTasks] = useState(state.tasks);
-		setTasks([...tasks, "This is new text"]);
+	function handleEnter(e) {
+		if (e.key == "Enter") {
+			addTask(e.target.value);
+			e.target.value = "";
+		}
+	}
+
+	async function addTask(task) {
+		let newTasks = [...goal.tasks, task];
+		goal.tasks = newTasks;
+		goal.totalTasks++;
+		setGoal({...goal, "tasks": newTasks, "totalTasks": goal.tasks.length})
+
 		try {
 			await fetch(`http://localhost:3001/goals/${state.id}`, {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(state.tasks)
+				body: JSON.stringify(goal)
 			});
+
 		} catch (err) {
-			console.log("There i can't even reach");
+			console.log(err);
 		}
-		console.log(state);
 	}
+
 
 	return (
 		<>
 			<div className="date">{date}</div>
 			<div className="card details">
 				<div className="top-details">
-					<h1 className="title">{goalName}</h1>
+					<h1 className="title">{goal.goalName}</h1>
 					<button className="delete" onClick={async () => {
 						await fetch(`http://localhost:3001/goals/${state.id}`, {
 							method: "DELETE"
@@ -60,16 +64,30 @@ function Details() {
 					<div className="progress"></div>
 				</div>
 				<div className="goal-details">
-					<p>Progress: {(completedTasks/totalTasks) * 100}%</p>
-					<p>Tasks Done: {completedTasks}</p>
-					<p>Tasks to do: {totalTasks}</p>
+					<p>Progress: {goal.totalTasks == 0 ? "0": (goal.completedTasks/goal.totalTasks) * 100}%</p>
+					<p>Tasks Done: {goal.completedTasks}</p>
+					<p>Tasks to do: {goal.totalTasks}</p>
 					<p>XP: 0</p>
-					<p>Priority: {priority}</p>
+					<p>Priority: {goal.priority}</p>
 				</div>
 				<div className="card tasks">
 					<h1 className="title">Tasks</h1>
-					<Task />
-					<button className='add task-btn' onClick={addTask}>+ Add Task</button>
+					<div>
+						{goal.tasks.map((n, index) => (
+							<div className="task-container" key={index}>
+								<div className="task">
+									<div className="checkbox">
+										<input type="checkbox" />
+									</div>
+									{n}
+								</div>
+								<div className="xp">5XP</div>
+							</div>
+						))}
+						<div className="task-input">
+							<input type="text" placeholder="Enter a task here..." onKeyDown={handleEnter}/>
+						</div>
+					</div>
 				</div>
 			</div>
 		</>

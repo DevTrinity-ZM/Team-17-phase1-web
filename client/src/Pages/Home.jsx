@@ -66,10 +66,6 @@ function Home() {
 		//for goal information input
 		const [goalName, setGoalName] = useState('');
 		const [deadline, setDeadline] = useState('');
-		const [totalTasks, setTotalTasks] = useState(0);
-		const [completedTasks, setCompletedTasks] = useState(0);
-		const [streak, setStreak] = useState(0);
-		const [priority, setPriority] = useState("Low");
 
 		const handleSubmit = () => {
 			let now = new Date();
@@ -85,10 +81,10 @@ function Home() {
 				goalName: goalName,
 				deadline: deadline,
 				daysLeft: days_left,
-				streak: streak,
-				totalTasks: Number(totalTasks),
-				completedTasks: Number(completedTasks),
-				priority: priority,
+				streak: 0,
+				totalTasks: 0,
+				completedTasks: 0,
+				priority: "low",
 				tasks: []
 			};
 
@@ -119,15 +115,6 @@ function Home() {
 							min={today}
 							value={deadline}
 							onChange={(e) => {setDeadline(e.target.value)}}
-						/>
-					</div>
-
-					<div className='field tasks'>
-						<h3>Number of tasks: </h3>
-						<input type="number" 
-							id="tasks"
-							value={totalTasks}
-							onInput={(e) => {setTotalTasks(e.target.value)}}
 						/>
 					</div>
 					

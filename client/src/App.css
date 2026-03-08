@@ -361,6 +361,7 @@ a {
 
 /*Details Page*/
 .details {
+	height: fit-content;
 	width: 100%;
 }
 .details .title {
@@ -409,12 +410,8 @@ a {
 .tasks {
 	background-color: #151A32;
 	width: 100%;
+	height: fit-content;
 	margin-top: 2rem;
-}
-
-.task-btn {
-	font-size: 0.9rem;
-	padding: 0.5rem;
 }
 
 .task-container {
@@ -449,8 +446,17 @@ a {
 	}
 }
 
-
-
+.task-input {
+	height: 2rem;
+	border-bottom: 1px solid #1A1F3A;
+}
+.task-input input {
+	height: 100%;
+	width: 100%;
+	background: transparent;
+	font-size: 1.3rem;
+	border: none;
+}
 
 @media screen and (max-width: 750px) {
 	body {

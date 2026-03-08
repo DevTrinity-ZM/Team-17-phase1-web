@@ -1,19 +1,18 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import './App.css';
 import Details from './Pages/Details';
 import Home from './Pages/Home';
+import { useState, useEffect } from 'react';
 
 function App() {
 	const [goals, setGoals] = useState([]);
-		
+	
 	useEffect(() => {
 		fetch("http://localhost:3001/goals")
 			.then(res => res.json())
 			.then(data => setGoals(data))
 			.catch(err => console.error(err));
 	}, []);
-	
 	return (
 		<BrowserRouter>
 			<nav>
