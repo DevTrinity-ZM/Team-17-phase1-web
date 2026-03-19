@@ -20,7 +20,12 @@ function Card({ className, title, children, tag='', metrics=''}) {
 					{
 						metrics.map((metric, index) => {
 							return (
-								<div key={index} className='metric-card'>{metric}</div>
+								<>
+									<div key={index} className='metric-card'>
+										{metric}
+										<div></div>
+									</div>
+								</>
 							)
 						})
 					}
@@ -84,6 +89,7 @@ function Home() {
 				streak: 0,
 				totalTasks: 0,
 				completedTasks: 0,
+				xp: 0,
 				priority: "low",
 				tasks: []
 			};
@@ -148,7 +154,7 @@ function Home() {
                                 </div>
                             </div>
                             <div className='progress-bar'>
-                                <div className="progress"></div>
+                                <div className="progress" style={{width: `${goal.totalTasks == 0 ? "0": (goal.completedTasks/goal.totalTasks) * 100}%`}}></div>
                             </div>
                         </div>
 						</Link>

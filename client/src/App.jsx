@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 
 function App() {
 	const [goals, setGoals] = useState([]);
+	const [completed, setCompleted] = useState([]);
 	
 	useEffect(() => {
 		fetch("http://localhost:3001/goals")
@@ -13,12 +14,20 @@ function App() {
 			.then(data => setGoals(data))
 			.catch(err => console.error(err));
 	}, []);
+
+	useEffect(() => {
+		fetch("http://localhost:3001/goals/completed")
+			.then(res => res.json())
+			.then(data => setCompleted(data))
+			.catch(err => console.error(err));
+	}, []);
+
 	return (
 		<BrowserRouter>
 			<nav>
 				<Link to="/">
 				<div className='logo-section'>
-					<div className="logo">M</div>
+					<div className='logo'><img src="/logo.png" alt="website logo" /></div>
 					<h1>Momentum</h1>
 				</div>
 				</Link>
@@ -30,7 +39,7 @@ function App() {
 					</div>
 					<div>
 						<p>COMPLETED</p>
-						<h2>0</h2>
+						<h2>{completed.length}</h2>
 					</div>
 					<div>
 						<p>TOTAL XP</p>
