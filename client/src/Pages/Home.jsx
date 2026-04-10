@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 //id in this case is used for styling, title is for the card, children is the card contents
 //tag is the button on the top right of the card, where available
 //metrics is only for the METRICS card
-function Card({ className, title, children, tag='', metrics=''}) {
+function Card({ className, title, children, tag=''}) {
 	return (
 		<div className={`card ${className}`}>
 			<div className='top'>
@@ -13,24 +13,6 @@ function Card({ className, title, children, tag='', metrics=''}) {
 			</div>
 
 			{children}
-
-			{/*Display metrics only for the metrics card*/}
-			{metrics && (
-				<div className='metric-container'>
-					{
-						metrics.map((metric, index) => {
-							return (
-								<>
-									<div key={index} className='metric-card'>
-										{metric}
-										<div></div>
-									</div>
-								</>
-							)
-						})
-					}
-				</div>
-			)}
 		</div>
 	)
 }
@@ -59,6 +41,7 @@ function Home() {
 			setGoals(updated);
 
 			setShowPopup(false);
+			window.location.reload()
 		} catch (err) {
 			console.error(err);
 		}
@@ -99,6 +82,18 @@ function Home() {
 			}
 		}
 
+		useEffect(() => {
+			const handler = (e) => {
+				if(e.key == "Enter" && !e.repeat) {
+					handleSubmit()
+				}
+			}
+
+			document.addEventListener("keydown", handler)
+
+			return () => document.removeEventListener("keydown", handler)
+		}, [goalName, deadline])
+
 		return (
 			<div className='popup-container'>
 				<div className='goal-popup'>
@@ -110,6 +105,7 @@ function Home() {
 							id="goalName"
 							value={goalName}
 							onChange={(e) => {setGoalName(e.target.value)}}
+							autoFocus={true}
 							required
 						/>
 					</div>
@@ -126,10 +122,20 @@ function Home() {
 					
 					<button className='cancel' onClick={() => {setShowPopup(false)}}>X</button>
 					<button className='submit' onClick={handleSubmit}>Add Goal</button>
+
 				</div>
 			</div>
 		)
 	}
+
+	//===== METRICS CALCULATIONS =====
+	//Completion Rate
+	let completionRate = 0;
+	for (let goal of goals) {
+		let goalProgress = (goal.totalTasks == 0) ? 0 : Math.round((goal.completedTasks/goal.totalTasks) * 100);
+		completionRate += goalProgress;
+	}
+	completionRate /= goals.length;
 
 	return (
         <>
@@ -150,7 +156,7 @@ function Home() {
                                 </div>
                                 <div>
                                     <p>XP</p>
-                                    <h3>0</h3>
+                                    <h3>{goal.xp}</h3>
                                 </div>
                             </div>
                             <div className='progress-bar'>
@@ -162,7 +168,23 @@ function Home() {
 					
 					<button className='add' onClick={() => {setShowPopup(true)}}>+ Add Goal</button>
 				</Card>
-				<Card className='metrics' title='METRICS' metrics={['Completion Rate', 'Avg. Tasks/Day', 'Focus Time']}></Card>
+
+				<Card className='metrics' title='METRICS'>
+						<div className='metric-card'>
+							<div className='info'>
+								<p>Completion Rate</p>
+								<h3>{completionRate.toFixed(2)}%</h3>
+								<div className='bar'><div className="level" style={{width: completionRate}}></div></div>
+							</div>
+							<button>+12%</button>
+						</div>
+						<div className='metric-card'>
+							<p>Avg. Tasks/Day</p>
+						</div>
+						<div className='metric-card'>
+							<p>Focus Time</p>
+						</div>
+				</Card>
 			</main>
 			<Card className='priority' title='PRIORITY QUEUE' tag='Sort'>
 				<div className='priorities'>
@@ -174,7 +196,6 @@ function Home() {
 					))}
 				</div>
 			</Card>
-			<Card className='metrics mobile' title='METRICS' metrics={['Completion Rate', 'Avg. Tasks/Day', 'Focus Time']}></Card>
 			{showPopup && <GoalPopup />}
         </>
 	)

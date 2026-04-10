@@ -1,0 +1,43 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+        font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.tab {
+    background: #12152C;
+    width: 50dvw;
+    height: 100dvh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+        justify-content: center;
+    align-items: center;
+}
+
+.welcome {
+    color: #00E9FF;
+}
+
+p {
+    color: #6C7293;
+}
+
+form {
+    margin-top: 1.9rem;
+}
+
+label {
+    color: #6C7293;
+    font-size: 0.9rem;
+}
+
+input {
+    background-color: #0D1029;
+    border: 1px solid #1A1F3A;
+    font-size: 1rem;
+    &::placeholder {
+        color: #1A1F3A;
+    }
+}

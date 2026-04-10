@@ -5,6 +5,7 @@ function Details() {
 	const { state } = useLocation();
 	const [goal, setGoal] = useState(state);
 
+	//importing the goal and setting it to that useState array up there
 	useEffect(() => {
 		fetch("http://localhost:3001/goals/")
 			.then(res => res.json())
@@ -13,6 +14,7 @@ function Details() {
 			})
 			.catch(err => console.error(err))
 	}, [])
+
 
 	async function updateGoal(newGoal) {
 		try {
@@ -26,9 +28,11 @@ function Details() {
 		}
 	}
 
+	//find today's date
 	let date = new Date();
 	date = date.toDateString();
 
+	//accepting user input and allowing them to add goals
 	function handleEnter(e) {
 		if (e.key == "Enter") {
 			addTask(e.target.value);
@@ -36,7 +40,7 @@ function Details() {
 		}
 	}
 	async function check(e) {
-		let taskID = Number(e.target.id);
+		let taskID = Number(e.target.id);//different ID's to access them easier
 
 		setGoal(prevGoal => {
 			const updatedGoal = {...prevGoal,
@@ -51,6 +55,7 @@ function Details() {
 			return updatedGoal;
 		});
 
+		//to count the number of tasks completed
 		setGoal(prevGoal => {
 			const updatedGoal = {...prevGoal,
 				"completedTasks": prevGoal.tasks.filter(t => t.completed).length,
@@ -60,6 +65,7 @@ function Details() {
 			return updatedGoal;
 		});
 
+		//5xp for each task
 		setGoal(prevGoal => {
 			const updatedGoal = {...prevGoal,
 				"xp": prevGoal.completedTasks * 5,
@@ -80,6 +86,7 @@ function Details() {
 		updateGoal(goal);
 	}
 
+	//add a goal to the completed list once it's done
 	async function completeGoal() {
 		if (goal.completedTasks == goal.totalTasks) {
 			await fetch(`http://localhost:3001/goals/${state.id}/complete`, { 
@@ -90,7 +97,7 @@ function Details() {
 
 			window.location.href = "/";
 		} else {
-			alert("You must complete all tasks first")
+			alert("You must complete all tasks first");
 		}
 	}
 
@@ -115,7 +122,7 @@ function Details() {
 					<div className="progress" style={{width: `${goal.totalTasks == 0 ? "0": (goal.completedTasks/goal.totalTasks) * 100}%`}}></div>
 				</div>
 				<div className="goal-details">
-					<p>Progress: {goal.totalTasks == 0 ? "0": (goal.completedTasks/goal.totalTasks) * 100}%</p>
+					<p>Progress: {goal.totalTasks == 0 ? "0": Math.round((goal.completedTasks/goal.totalTasks) * 100)}%</p>
 					<p>Tasks Done: {goal.completedTasks}</p>
 					<p>Tasks to do: {goal.totalTasks}</p>
 					<p>XP: {goal.xp}</p>
