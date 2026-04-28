@@ -12,8 +12,7 @@ management, deadline-aware prioritization, and meaningful progress tracking.
 
 ## Team Roles
 - **Frontend**: @benkazadi - React development
-- **Backend**: @FRANK-B-z - API & database
-- **UI/UX**: @GTIS-dotcom - Design & user experience
+- **Backend**: @FRANK-B-z - API & database
 - **Documentation**: @chirwalusungu126-dotcom - Docs & guides
 - **Security**: Chipo187 - Security
 

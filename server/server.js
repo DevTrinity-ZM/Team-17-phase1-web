@@ -1,99 +1,139 @@
-import express from "express";
-import { readFileSync, writeFileSync } from "fs";
-import cors from "cors";
-import { json } from "stream/consumers";
-import { error } from "console";
-
+const express = require("express");
 const app = express();
+const cors = require("cors");
+const pool = require("./db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
-app.get("/goals/completed", (req, res) => {
-    const data = readFileSync("completedGoals.json", "utf-8");
-    res.json(JSON.parse(data));
+// Ensure uploads folder exists
+if (!fs.existsSync("./uploads")) fs.mkdirSync("./uploads");
+
+const storage = multer.diskStorage({
+    destination: "./uploads/",
+    filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+});
+const upload = multer({ storage });
+
+const JWT_SECRET = "momentum_secret_123";
+
+// signup
+
+app.post("/auth/signup", async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+        const userCheck = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (userCheck.rows.length > 0) return res.status(400).json("User exists");
+
+        const hash = await bcrypt.hash(password, 10);
+        const newUser = await pool.query(
+            "INSERT INTO users (username, email, password, profile_pic) VALUES($1, $2, $3, $4) RETURNING *",
+            [username, email, hash, '/uploads/default.png']
+        );
+        res.json(newUser.rows[0]);
+    } catch (err) { res.status(500).json(err.message); }
 });
 
-app.get("/goals", (req, res) => {
-  	const data = readFileSync("goals.json", "utf-8");
-  	res.json(JSON.parse(data));
+
+//login
+app.post("/auth/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (user.rows.length === 0) return res.status(401).json("Invalid email");
+        
+        const valid = await bcrypt.compare(password, user.rows[0].password);
+        if (!valid) return res.status(401).json("Invalid password");
+
+        const token = jwt.sign({ id: user.rows[0].user_id }, JWT_SECRET, { expiresIn: '24h' });
+        const { password: _, ...userWithoutPassword } = user.rows[0];
+        res.json({ token, user: userWithoutPassword });
+    } catch (err) { res.status(500).json(err.message); }
 });
 
-app.post("/goals", (req, res) => {
-	const data = readFileSync("goals.json", "utf-8");
-	const goals = JSON.parse(data);
 
-	goals.push(req.body);
 
-	writeFileSync("goals.json", JSON.stringify(goals, null, 2));
 
-	res.json({ message: "Goal added" });
+
+// Fetch goals for specific user 
+app.get("/goals/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const all = await pool.query(
+            `SELECT todo_id as id, goal_name as "goalName", tasks, 
+            completed_tasks as "completedTasks", total_tasks as "totalTasks", 
+            xp, priority, deadline FROM todo WHERE user_id = $1 ORDER BY todo_id DESC`,
+            [userId]
+        );
+        res.json(all.rows);
+    } catch (err) { res.status(500).json(err.message); }
 });
 
-app.delete("/goals/:id", (req, res) => {
-	const data = readFileSync("goals.json", "utf-8");
-	let goals = JSON.parse(data);
-
-	goals = goals.filter(goal => goal.id != req.params.id);
-
-	writeFileSync("goals.json", JSON.stringify(goals, null, 2));
-
-	res.json({ message: "Deleted" });
+//  Save new goal 
+app.post("/goals", async (req, res) => {
+    try {
+        const { goalName, tasks, completedTasks, totalTasks, xp, priority, deadline, userId } = req.body;
+        const newG = await pool.query(
+            "INSERT INTO todo (goal_name, tasks, completed_tasks, total_tasks, xp, priority, deadline, user_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING todo_id as id",
+            [goalName, JSON.stringify(tasks), completedTasks, totalTasks, xp, priority, deadline, userId]
+        );
+        res.json(newG.rows[0]);
+    } catch (err) { res.status(500).json(err.message); }
 });
 
-app.patch("/goals/:id", (req, res) => {
-	try {
-		const data = readFileSync("goals.json", "utf-8");
-		let goals = JSON.parse(data);
-
-		let goal = goals.find(g => g.id == req.params.id);
-
-		if (!goal) {
-			return res.status(404).json({ error: "Goal not found" });
-		}
-
-		goal.totalTasks = req.body.totalTasks;
-		goal.tasks = req.body.tasks;
-		goal.completedTasks = req.body.completedTasks;
-		goal.xp = req.body.xp;
-
-		writeFileSync("goals.json", JSON.stringify(goals, null, 2));
-
-		res.json({ message: "Goal Updated" });
-	} catch (err) {
-		console.error("PATCH ERROR:", err);
-		res.status(500).json({ error: "Write failed" });
-	}
+//Update tasks and XP 
+app.patch("/goals/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { tasks, completedTasks, totalTasks, xp } = req.body;
+        await pool.query(
+            "UPDATE todo SET tasks=$1, completed_tasks=$2, total_tasks=$3, xp=$4 WHERE todo_id=$5", 
+            [JSON.stringify(tasks), completedTasks, totalTasks || 0, xp || 0, id]
+        );
+        res.json("OK");
+    } catch (err) { res.status(500).json(err.message); }
 });
 
-//for completed goals
-app.post("/goals/:id/complete", (req, res) => {
-	try {
-        const goalsData = readFileSync("goals.json", "utf-8");
-        let goals = JSON.parse(goalsData);
 
-		const completedData = readFileSync("completedGoals.json", "utf-8");
-		let completedGoals = JSON.parse(completedData);
 
-		const goal = goals.find(g => g.id == req.params.id);
-        if (!goal) {
-            return res.status(404).json({ error: "Goal not found" });
-        }
 
-        completedGoals.push({ ...goal, completedAt: new Date().toISOString() });
-        goals = goals.filter(g => g.id != req.params.id);
 
-		writeFileSync("goals.json", JSON.stringify(goals, null, 2));
-        writeFileSync("completedGoals.json", JSON.stringify(completedGoals, null, 2));
-
-		res.json({ message: "Goal completed" });
-	} catch(err) {
-		console.error("COMPLETION ERROR: ", err);
-		res.status(500).json({error: "Could not complete goal"});
-	}
+//  Goal Completion 
+app.post("/goals/:id/complete", async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        await pool.query("DELETE FROM todo WHERE todo_id = $1", [id]);
+        res.json("Goal archived");
+    } catch (err) { res.status(500).json(err.message); }
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
-  console.log("Server running on port 3001");
+//  Delete 
+app.delete("/goals/:id", async (req, res) => {
+    try {
+        await pool.query("DELETE FROM todo WHERE todo_id = $1", [req.params.id]);
+        res.json("Deleted");
+    } catch (err) { res.status(500).json(err.message); }
 });
+
+
+
+
+// PROFILE 
+
+app.post("/auth/upload-profile", upload.single('profilePic'), async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const imageUrl = `/uploads/${req.file.filename}`;
+        await pool.query("UPDATE users SET profile_pic = $1 WHERE user_id = $2", [imageUrl, userId]);
+        res.json({ imageUrl });
+    } catch (err) { res.status(500).json(err.message); }
+});
+
+app.listen(3001, () => console.log("Server running on port 3001"));
